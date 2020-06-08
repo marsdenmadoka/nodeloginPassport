@@ -9,6 +9,12 @@ const passport = require('passport');
 
 require('../models/user');
 var AddUser = mongoose.model('Userdetails');/*fetching the schema from model*/
+var app = express();
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 passport.use(AddUser.createStrategy());
 passport.serializeUser(AddUser.serializeUser());
@@ -28,7 +34,7 @@ router.post('/login', (req, res, next) => {
       }
   
       if (!user) {
-        //req.flash('info', 'Flash is back!')
+        req.flash('info', 'Flash is back!')
         return res.redirect('/login?info='+info);
         
       }
@@ -45,10 +51,10 @@ router.post('/login', (req, res, next) => {
 
 })
 
-
-// AddUser.register({username:'paul', active: false}, 'paul');
-// AddUser.register({username:'jay', active: false}, 'jay');
-// AddUser.register({username:'roy', active: false}, 'roy');
+  
+AddUser.register({username:'paul', active: false}, 'paul');
+AddUser.register({username:'jay', active: false}, 'jay');
+AddUser.register({username:'roy', active: false}, 'roy');
 
 
 
