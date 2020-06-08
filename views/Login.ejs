@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        
+		<style>
+			body {
+    background-color: #f0e68c;
+}
+.heading h1{
+	text-align: center;
+			color: #4e08f1;
+			font-style: italic;
+            font-weight: bold;
+			font-size: 24px;
+			padding: 20px 0 20px 0;
+
+}
+		.login-form {
+
+			width: 300px;
+			margin: 0 auto;
+			font-family: Tahoma, Geneva, sans-serif;
+        
+		}
+		.login-form h1 {
+			text-align: center;
+			color: rgb(226, 55, 12);
+			text-decoration: underline; 
+			font-style: italic;
+            font-weight: bold;
+			font-size: 18px;
+			margin-bottom: 2px;
+		}
+		.login-form input[type="password"],
+		.login-form input[type="text"] {
+			width: 100%;
+			padding: 15px;
+			color: green;
+			border: 1px solid #dddddd;
+			margin-bottom: 15px;
+			box-sizing:border-box;
+		}
+
+		.login-form label[for="username"],
+		.login-form label[for="password"]{
+			color: rgb(226, 55, 12);
+			font-size: 20px;
+
+		}
+		.login-form input[type="submit"] {
+			width: 100%;
+			padding: 15px;
+			background-color: #535b63;
+			border: 0;
+			box-sizing: border-box;
+			cursor: pointer;
+			font-weight: bold;
+          font-size:large;
+			color: #ffffff;
+
+		}
+       .login-form p {
+        width: 300px;
+        text-align:justify;
+		text-decoration: underline;
+        background-color: #f0e68c;
+        margin-top: 20px;
+        }
+		</style>
+	</head>
+	<body>
+
+		<div class="heading">
+			<h1>Welcome to Uchumi Hospital Queue System</h1>
+		</div>
+		<div class="login-form" col-md-6>
+            <h1>Receiptionist Login !</h1>
+            <form action="/users/login" method="POST">
+                
+        <label for="username">username</label>
+       <input type="text" name="username" placeholder="username" required>
+
+        <label for="password">password</label>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <input type="submit" value="Login"/>
+       
+        <!-- <input type="submit"> -->
+</form>
+<div >
+<p><a href="/">Register Account!</a></p>
+</div>
+	</div>
+	
+
+
+	
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+	</body>
+</html>
+
+
+
