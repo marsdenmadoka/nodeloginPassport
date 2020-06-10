@@ -58,22 +58,32 @@ input[type=submit] {
                   
         <div class="col-md-6 main"> 
                       
-            <form action="/users/register" method="post"> 
+            <form action="/users/reset/:token" method="post"> 
                       
-            <h1> Receiptionist Signup here!</h1> 
-                              
-            <input class="box" type="text" name="username" id="name" 
-            placeholder="Name"  required /><br> 
-                              
-            <input class="box" type="email" name="email" id="email" 
-            placeholder="E-Mail " required /><br> 
+            <h1> Reset Password!</h1> 
+            <div class="flashes">
+				<% if ( expressFlash.length > 0 ) { %>
+					<div class="alert alert-danger alert-dismissible fade show">
+						 <%= expressFlash %>
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+					</div>
+					<% } %>
+					<% if ( sessionFlash && sessionFlash.message) { %>
+					<div class="<%= sessionFlash.type %>">
+						<strong>FLASH!</strong> <%= sessionFlash.message %>
+					</div>
+					<% } %>
+			  </div>
+                                        
+            <input class="box" type="password" name="password" 
+            id="password" placeholder="new Password " required/><br> 
 
             <input class="box" type="password" name="password" 
-            id="password" placeholder="Password " required/><br> 
+            id="password" placeholder="Confirm Password " required/><br> 
                               
                         <br> 
             <input type="submit" id="submitDetails"  
-            name="submitDetails" value="Register" /><br> 
+            name="submitDetails" value="update password" /><br> 
                       
             </form> 
             <div mt-20>

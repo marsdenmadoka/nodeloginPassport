@@ -1,26 +1,16 @@
 var express = require('express');
 var router = express.Router();
 var flash = require('connect-flash');
+var mongoose = require('mongoose');
 const connectEnsureLogin = require('connect-ensure-login');
-/* GET home page. */
+
+require('../models/user');
+var User = mongoose.model('User');/*fetching the schema from model*/
 
 
 
 
-router.get('/login', function(req, res){
-  res.render('Login', {
-    expressFlash: req.flash('success'), sessionFlash: res.locals.sessionFlash,
-    user: req.user,
-  
-  });
-});
-
-router.get('/register', function(req, res) {
-  res.render('Register', {
-    user: req.user
-  });
-});
-
+//we defined our own routes
 router.get('/',connectEnsureLogin.ensureLoggedIn(),function(req, res) {
   res.render('Homepage', {
     user: req.user
@@ -28,29 +18,26 @@ router.get('/',connectEnsureLogin.ensureLoggedIn(),function(req, res) {
 });
 
 
-
-// router.get('/login',function(req,res,next){
-//   res.render("Login",{title:'Login'})
-//    });
+router.get('/LogIn', function(req, res){
+  res.render('Login', {
+    expressFlash: req.flash('success'), sessionFlash: res.locals.sessionFlash,
+    user: req.user,
   
-// router.get('/register', function(req, res, next) {
-//   res.render('Register', { title: 'Express' });
-// });
+  });
+});
 
-// router.get('/',connectEnsureLogin.ensureLoggedIn(),function(req, res){
+router.get('/RegiSter', function(req, res) {
+  res.render('Register', {
+    user: req.user
+  });
+});
 
-//     res.render('Homepage', {root: __dirname})
-
-//   });
-
-//   router.get('/about',function(req, res){
-
-//     res.render('About', {root: __dirname})
-
-//   });
-
-
-
+router.get('/forgot', function(req, res) {
+  res.render('Forgot', {
+  expressFlash: req.flash('myflash'), sessionFlash: res.locals.sessionFlash,
+    user: req.user
+  });
+});
 
 
 module.exports = router;

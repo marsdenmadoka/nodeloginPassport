@@ -8,38 +8,7 @@ var flash = require('connect-flash');
 var LocalStrategy = require('passport-local').Strategy;
 var async = require('async');
 const passport = require('passport');
-// const expressSession = require('express-session')({
-//     secret: 'secret',
-//     resave: false,
-//     saveUninitialized: false
-//   });
-
-
-
-//   router.use(bodyParser.json());
-//   router.use(bodyParser.urlencoded({ extended: true }));
-//   router.use(passport.initialize());
-//   router.use(passport.session());
-//   router.use(expressSession);
-//   router.use(cookieParser());
-//   router.use(flash());
-//   router.use(function(req, res, next){
-//     // if there's a flash message in the session request, make it available in the response, then delete it
-//     res.locals.sessionFlash = req.session.sessionFlash;
-//     delete req.session.sessionFlash;
-//     next();
-// });
-
-
-// var express = require('express');
-// var session = require('express-session');
-// var cookieParser = require('cookie-parser');
-// var flash = require('connect-flash');
-// var app = express();
-// app.use(cookieParser('secret'));
-// app.use(session({cookie: { maxAge: 60000 }}));
-// app.use(flash());
-
+var crypto = require('crypto');//no need to install crypto it is ready made in nodejs
 
 
 mongoose.connect('mongodb://localhost:27017/Registerforms',{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
@@ -48,13 +17,11 @@ db.on('error', console.log.bind(console, "connection error"));
 db.once('open', function(callback){ 
     console.log("connection succeeded"); 
 }) 
+
+
 require('../models/user');
 var User = mongoose.model('User');/*fetching the schema from model*/
 
-
-
-//  app.use(session({ secret: 'session secret key' }));
-// app.use(session({ secret: 'session secret key' }))
 
 // passport.use(AddUser.createStrategy());
 // passport.serializeUser(AddUser.serializeUser());
@@ -90,7 +57,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
       if (err) return next(err)
       if (!user){
         req.flash ('success','incorrect Username or password') 
-        return res.redirect('/login')
+        return res.redirect('/LogIn')
       }
       req.logIn(user, function(err) {
         if (err) return next(err);
@@ -116,80 +83,135 @@ passport.use(new LocalStrategy(function(username, password, done) {
     });
   });
 
-
   router.get('/logout', function(req, res){
     req.logout();
-    res.redirect('/login');
+    res.redirect('/LogIn');
   });
+
+     //reset password
+//Here we are using async module to avoid nesting callbacks within callbacks within callbacks.
+  router.post('/forgot', function(req, res, next) {
+    async.waterfall([
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString('hex');
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        User.findOne({ email: req.body.email }, function(err, user) {
+          if (!user) {
+            req.flash('myflash', 'No account with that email address exists.');
+            return res.redirect('/forgot');
+          }
+  
+          user.resetPasswordToken = token;
+          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  
+          user.save(function(err) {
+            done(err, token, user);
+          });
+        });
+      },
+      function(token, user, done) {
+        var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+          auth: {
+            user: 'marsmadoka98@gmail.com',
+            pass: '@MADoka98'
+          }
+        });
+        var mailOptions = {
+          to: user.email,
+          from: 'passwordreset@demo.com',
+          subject: 'Node.js Password Reset',
+          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+            'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+        };
+        transporter.sendMail(mailOptions, function(err) {
+          req.flash('myflash', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+          done(err, 'done');
+        });
+      }
+    ], function(err) {
+      if (err) return next(err);
+      res.redirect('/forgot');
+    });
+  });
+
+
+  //It immediately checks if there exists a user with a given password reset token and that token has not expired yet.
+// If user is found, it will display a page to setup a new password.
+router.get('/reset/:token', function(req, res) {
+    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+      if (!user) {
+        req.flash('myflash', 'Password reset token is invalid or has expired.');
+        return res.redirect('/forgot');
+      }
+     res.render('Reset', {
+        user: req.user,
+        expressFlash: req.flash('myflash'), sessionFlash: res.locals.sessionFlash
+      });
+  
+    });
+  });
+  router.post('users/reset/:token', function(req, res) {
+    async.waterfall([
+      function(done) {
+        User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+          if (!user) {
+            req.flash('myflash', 'Password reset token is invalid or has expired.');
+            return res.redirect('back');
+          }
+  
+          user.password = req.body.password;
+          user.resetPasswordToken = undefined;
+          user.resetPasswordExpires = undefined;
+  
+          user.save(function(err) {
+            req.logIn(user, function(err) {
+              done(err, user);
+            });
+          });
+        });
+      },
+      function(user, done) {
+        var transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: {
+            user: 'marsmadoka98@gmail.com',
+            pass: '@MADOKa98'
+          }
+        });
+        var mailOptions = {
+          to: user.email,
+          from: 'passwordreset@demo.com',
+          subject: 'Your password has been changed',
+          text: 'Hello,\n\n' +
+            'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+        };
+        transporter.sendMail(mailOptions, function(err) {
+          req.flash('success', 'Success! Your password has been changed.');
+          done(err);
+        });
+      }
+    ], function(err) {
+      res.redirect('/');
+    });
+  });
+  
+
+
+
   
   module.exports = router;
 
-// router.post('/login', (req, res, next) => {
-
-//     passport.authenticate('local',
-//     (err, user, info) => {
-//       if (err) {
-//         return next(err);
-//       }
-  
-//       if (!user) {
-//         req.flash('info', 'Flash is back!')
-//         return res.redirect('/login?info='+info);
-        
-//       }
-  
-//       req.logIn(user, function(err) {
-//         if (err) {
-//           return next(err);
-//         }
-  
-//         return res.redirect('/');
-//       });
-  
-//     })(req, res, next);
-
-// })
-
-// router.post('/register', function(req, res) {
-//     var user = new AddUser({
-//         username: req.body.username,
-//         email: req.body.email,
-//         password: req.body.password
-//       });
-  
-
-//       db.collection('details').insertOne(user,function(err,collection){
-//    req.logIn(user,function(err){
-//        if(err)throw err;
-//        res.redirect('/')
-//    })
-        
-//       })
-
-//     // user.save(function(err) {
-//     //   req.logIn(user, function(err) {
-//     //       if(err)throw err;
-//     //       console.log('record inserted')
-//     //     res.redirect('/');
-//     //   });
-//     // });
-//   });
-
-
-//   db.collection('details').insertOne(user,function(err, collection){ 
-//     if (err) throw err; 
-// console.log("Record inserted Successfully");  
-// }); 
 
 
 // AddUser.register({username:'paul', active: false}, 'paul');
 // AddUser.register({username:'jay', active: false}, 'jay');
 // AddUser.register({username:'roy', active: false}, 'roy');
-
-
-
-// router.get('/home', connectEnsureLogin.ensureLoggedIn(),function(req,res,next){
-//     res.render('Homepage',{title:'homepae'});
-//     });
 
 
