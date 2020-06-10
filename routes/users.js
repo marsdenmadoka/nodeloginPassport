@@ -2,25 +2,44 @@ var express = require('express');
 var router = express.Router();
 var bodyParser=require("body-parser"); 
 var mongoose = require('mongoose');
-var flash = require('connect-flash');
 var nodemailer = require('nodemailer');
+var cookieParser = require('cookie-parser');
+var flash = require('connect-flash');
 var LocalStrategy = require('passport-local').Strategy;
 var async = require('async');
-//const connectEnsureLogin = require('connect-ensure-login');
 const passport = require('passport');
-const expressSession = require('express-session')({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false
-});
+// const expressSession = require('express-session')({
+//     secret: 'secret',
+//     resave: false,
+//     saveUninitialized: false
+//   });
 
-var app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressSession);
-app.use(flash());
-app.use(passport.initialize());
-app.use(passport.session());
+
+
+//   router.use(bodyParser.json());
+//   router.use(bodyParser.urlencoded({ extended: true }));
+//   router.use(passport.initialize());
+//   router.use(passport.session());
+//   router.use(expressSession);
+//   router.use(cookieParser());
+//   router.use(flash());
+//   router.use(function(req, res, next){
+//     // if there's a flash message in the session request, make it available in the response, then delete it
+//     res.locals.sessionFlash = req.session.sessionFlash;
+//     delete req.session.sessionFlash;
+//     next();
+// });
+
+
+// var express = require('express');
+// var session = require('express-session');
+// var cookieParser = require('cookie-parser');
+// var flash = require('connect-flash');
+// var app = express();
+// app.use(cookieParser('secret'));
+// app.use(session({cookie: { maxAge: 60000 }}));
+// app.use(flash());
+
 
 
 mongoose.connect('mongodb://localhost:27017/Registerforms',{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
@@ -44,12 +63,12 @@ var User = mongoose.model('User');/*fetching the schema from model*/
 passport.use(new LocalStrategy(function(username, password, done) {
     User.findOne({ username: username }, function(err, user) {
       if (err) return done(err);
-      if (!user) return done(null, false, { message: 'Incorrect username.' });
+      if (!user) return done(null, false);
       user.comparePassword(password, function(err, isMatch) {
         if (isMatch) {
           return done(null, user);
         } else {
-          return done(null, false, { message: 'Incorrect password.' });
+          return done(null, false);
         }
       });
     });
@@ -69,12 +88,13 @@ passport.use(new LocalStrategy(function(username, password, done) {
   router.post('/login', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
       if (err) return next(err)
-      if (!user) {
+      if (!user){
+        req.flash ('success','incorrect Username or password') 
         return res.redirect('/login')
       }
       req.logIn(user, function(err) {
         if (err) return next(err);
-        return res.redirect('/home');
+        return res.redirect('/');
       });
     })(req, res, next);
   });
@@ -91,10 +111,17 @@ passport.use(new LocalStrategy(function(username, password, done) {
     user.save(function(err) {
       req.logIn(user, function(err) {
           if(err) throw err
-        res.redirect('/home');
+        res.redirect('/');
       });
     });
   });
+
+
+  router.get('/logout', function(req, res){
+    req.logout();
+    res.redirect('/login');
+  });
+  
   module.exports = router;
 
 // router.post('/login', (req, res, next) => {

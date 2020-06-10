@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var flash = require('connect-flash');
 const connectEnsureLogin = require('connect-ensure-login');
 /* GET home page. */
 
@@ -8,8 +9,9 @@ const connectEnsureLogin = require('connect-ensure-login');
 
 router.get('/login', function(req, res){
   res.render('Login', {
-    title: 'Express',
-    user: req.user
+    expressFlash: req.flash('success'), sessionFlash: res.locals.sessionFlash,
+    user: req.user,
+  
   });
 });
 
@@ -24,6 +26,7 @@ router.get('/',connectEnsureLogin.ensureLoggedIn(),function(req, res) {
     user: req.user
   });
 });
+
 
 
 // router.get('/login',function(req,res,next){

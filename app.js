@@ -2,28 +2,21 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var mongoose = require('mongoose');
 var logger = require('morgan');
-const passport = require('passport');
+var passport = require('passport');
 var flash = require('connect-flash');
-const bodyParser = require('body-parser');
-const expressSession = require('express-session')({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false
-});
+var bodyParser = require('body-parser');
+var session = require('express-session')
+var sessionStore = new session.MemoryStore;
 
 
-// require('../models/user');
-// 
 
+ //requring routes
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-require('./models/user')
-var User = mongoose.model('User');
+
 
 var app = express();
-
 
 
 // view engine setup
@@ -31,28 +24,51 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 
-/*configuring express sessions*/
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressSession);
+app.use(cookieParser('secret'));
+app.use(session({
+  secret: 'secret',
+  store: sessionStore,
+  cookie: { maxAge: 60000 },
+  resave: 'true',
+  saveUninitialized: true
+}));
 app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
-
-/*end of configuring express sessions*/
-
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+ //routes middleware
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/',User)
 
 
+// Custom flash middleware -- from Ethan Brown's book, 'Web Development with Node & Express'
+app.use(function(req, res, next){
+  res.locals.sessionFlash = req.session.sessionFlash;
+  delete req.session.sessionFlash;
+  next();
+});
+// Route that creates a flash message using the express-flash module
+app.all('/express-flash', function( req, res ) {
+  req.flash('success', 'This is a flash message using the express-flash module.');
+  res.redirect(301, '/');
+});
+
+// Route that creates a flash message using custom middleware
+app.all('/session-flash', function( req, res ) {
+  req.session.sessionFlash = {
+      type: 'success',
+      message: 'This is a flash message using custom middleware and express-session.'
+  }
+  res.redirect(301, '/');
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -72,9 +88,6 @@ app.use(function(err, req, res, next) {
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log('App listening on port ' + port));
 
-// app.listen(5000, function(){
-//   console.log("server started at 5000");
-// })
 
 module.exports = app;
 
