@@ -20,7 +20,7 @@ var UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
+
 resetPasswordToken:{ 
   String
 },
@@ -29,8 +29,6 @@ resetPasswordToken:{
     }
 
 });
-
-//const UserDetails = mongoose.model('userInfo', UserDetail, 'userInfo');
 
 UserSchema.pre('save', function(next) {
   var user = this;

@@ -118,7 +118,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
         service: 'Gmail',
           auth: {
             user: 'marsmadoka98@gmail.com',
-            pass: '@MADoka98'
+            pass: '************'
           }
         });
         var mailOptions = {
@@ -182,7 +182,7 @@ router.get('/reset/:token', function(req, res) {
           service: 'Gmail',
           auth: {
             user: 'marsmadoka98@gmail.com',
-            pass: '@MADOKa98'
+            pass: '***********'
           }
         });
         var mailOptions = {
