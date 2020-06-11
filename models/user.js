@@ -21,14 +21,12 @@ var UserSchema = new mongoose.Schema({
     required: true,
   },
 
-resetPasswordToken:{ 
-  String
-},
-  resetPasswordExpires:{
-     Date
-    }
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 
 });
+
+//const UserDetails = mongoose.model('userInfo', UserDetail, 'userInfo');
 
 UserSchema.pre('save', function(next) {
   var user = this;

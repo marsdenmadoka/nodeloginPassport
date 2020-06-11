@@ -10,6 +10,10 @@ var async = require('async');
 const passport = require('passport');
 var crypto = require('crypto');//no need to install crypto it is ready made in nodejs
 
+ require('dotenv').config()
+ const Emailaddress=process.env.EMAILADDRESS
+ const EmailPassword=process.env.EMAILPASSWORD
+ //console.log(Emailaddress,EmailPassword)
 
 mongoose.connect('mongodb://localhost:27017/Registerforms',{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
 var db=mongoose.connection; 
@@ -117,8 +121,8 @@ passport.use(new LocalStrategy(function(username, password, done) {
         var transporter = nodemailer.createTransport({
         service: 'Gmail',
           auth: {
-            user: 'marsmadoka98@gmail.com',
-            pass: '************'
+            user: Emailaddress,
+            pass: EmailPassword
           }
         });
         var mailOptions = {
@@ -181,8 +185,8 @@ router.get('/reset/:token', function(req, res) {
         var transporter = nodemailer.createTransport({
           service: 'Gmail',
           auth: {
-            user: 'marsmadoka98@gmail.com',
-            pass: '***********'
+            user: Emailaddress,
+            pass: EmailPassword
           }
         });
         var mailOptions = {
