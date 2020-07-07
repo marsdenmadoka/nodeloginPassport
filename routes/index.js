@@ -39,5 +39,4 @@ router.get('/forgot', function(req, res) {
   });
 });
 
-
 module.exports = router;

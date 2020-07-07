@@ -49,27 +49,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 
-// Custom flash middleware -- from Ethan Brown's book, 'Web Development with Node & Express'
-app.use(function(req, res, next){
-  res.locals.sessionFlash = req.session.sessionFlash;
-  delete req.session.sessionFlash;
-  next();
-});
-// Route that creates a flash message using the express-flash module
-app.all('/express-flash', function( req, res ) {
-  req.flash('success', 'This is a flash message using the express-flash module.');
-  res.redirect(301, '/');
-});
-
-// Route that creates a flash message using custom middleware
-app.all('/session-flash', function( req, res ) {
-  req.session.sessionFlash = {
-      type: 'success',
-      message: 'This is a flash message using custom middleware and express-session.'
-  }
-  res.redirect(301, '/');
-});
-// catch 404 and forward to error handler
+// // Custom flash middleware -- from Ethan Brown's book, 'Web Development with Node & Express'
 app.use(function(req, res, next) {
   next(createError(404));
 });

@@ -7,9 +7,8 @@ var cookieParser = require('cookie-parser');
 var flash = require('connect-flash');
 var LocalStrategy = require('passport-local').Strategy;
 var async = require('async');
-const passport = require('passport');
+var passport = require('passport');
 var crypto = require('crypto');//no need to install crypto it is ready made in nodejs
-
  require('dotenv').config()
  const Emailaddress=process.env.EMAILADDRESS
  const EmailPassword=process.env.EMAILPASSWORD
@@ -148,7 +147,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
 
   //It immediately checks if there exists a user with a given password reset token and that token has not expired yet.
 // If user is found, it will display a page to setup a new password.
-router.get('/reset/:token', function(req, res) {
+router.get("/reset/:token", function(req, res) {
     User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
       if (!user) {
         req.flash('myflash', 'Password reset token is invalid or has expired.');
@@ -156,12 +155,12 @@ router.get('/reset/:token', function(req, res) {
       }
      res.render('Reset', {
         user: req.user,
-        expressFlash: req.flash('myflash'), sessionFlash: res.locals.sessionFlash
       });
   
     });
   });
-  router.post('users/reset/:token', function(req, res) {
+
+  router.post('/users/resttoken', function(req, res) {
     async.waterfall([
       function(done) {
         User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {

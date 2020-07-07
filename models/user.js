@@ -28,6 +28,12 @@ var UserSchema = new mongoose.Schema({
 
 //const UserDetails = mongoose.model('userInfo', UserDetail, 'userInfo');
 
+// UserSchema.methods.comparePassword = function(password) {
+//   return bcrypt.compareSync(password, this.hash_password);
+// };
+
+
+
 UserSchema.pre('save', function(next) {
   var user = this;
   var SALT_FACTOR = 5;
