@@ -12,9 +12,9 @@ var crypto = require('crypto');//no need to install crypto it is ready made in n
  require('dotenv').config()
  const Emailaddress=process.env.EMAILADDRESS
  const EmailPassword=process.env.EMAILPASSWORD
- //console.log(Emailaddress,EmailPassword)
-
-mongoose.connect('mongodb://localhost:27017/Registerforms',{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
+ const ConnectString=process.env.MONGODBSTRING
+ //mongodb+srv://marsden:yourpassword@cluster0-ewzaf.mongodb.net/dbname?retryWrites=true&w=majority
+mongoose.connect(ConnectString,{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function(callback){ 
