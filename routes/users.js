@@ -18,7 +18,7 @@ mongoose.connect(ConnectString,{useNewUrlParser: true,useCreateIndex:true,useUni
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function(callback){ 
-    console.log("connection succeeded"); 
+    console.log("connection to db succeeded"); 
 }) 
 
 
