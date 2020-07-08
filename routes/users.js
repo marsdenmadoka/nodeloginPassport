@@ -14,7 +14,7 @@ var crypto = require('crypto');//no need to install crypto it is ready made in n
  const EmailPassword=process.env.EMAILPASSWORD
  const ConnectString=process.env.MONGODBSTRING
  //mongodb+srv://marsden:yourpassword@cluster0-ewzaf.mongodb.net/dbname?retryWrites=true&w=majority
-mongoose.connect('mongodb+srv://marsden:madoka98@cluster0-ewzaf.mongodb.net/Registerforms?retryWrites=true&w=majority',{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
+mongoose.connect(ConnectString,{useNewUrlParser: true,useCreateIndex:true,useUnifiedTopology: true}); 
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function(callback){ 
